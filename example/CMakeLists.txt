@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.21)
+cmake_minimum_required(VERSION 3.16)
 
 set(target lab1)
 set(CMAKE_CXX_STANDARD 17)
@@ -12,8 +12,6 @@ file(GLOB_RECURSE sources
 )
 
 set(CMAKE_CXX_STANDARD 14)
-
-add_compile_options(-Wl,--stack,67108864)
 
 add_executable(${target} ${sources})
 

@@ -57,6 +57,8 @@ class Frame
     void DrawCircle(const Circle<uint32_t>& circle);
     void DrawCircleAxes(const Circle<uint32_t>& circle);
     void FloodFill8(Vector2<uint32_t> startpoint, uint32_t fillcolor, uint32_t stopcolor);
+    void FloodFill8Stack(Vector2<uint32_t> startpoint, uint32_t fillcolor, uint32_t stopcolor);
+    
     Vector2<uint32_t>* FindIntersection();
 
     uint32_t* data;

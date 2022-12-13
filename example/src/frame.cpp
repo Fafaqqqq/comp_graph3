@@ -1,7 +1,9 @@
 #include "frame.h"
 
 #include <cmath>
+#include <cstdint>
 #include <cstdio>
+#include <vector>
 
 #define pi 3.1415
 
@@ -174,7 +176,7 @@ void Frame::DrawFrame(const std::vector<Circle<uint32_t>>& circles)
 
 	if (res)
 	{
-		FloodFill8(*res, 0xEBE39EFF, 0);
+		FloodFill8Stack(*res, 0xEBE39EFF, 0);
 	}
 }
 
@@ -225,10 +227,37 @@ Vector2<uint32_t>* Frame::FindIntersection()
 		{
 			if (!count--)
 			{
-				return new Vector2<uint32_t>{x, y};
+				return new Vector2<uint32_t>{(uint32_t)x, (uint32_t)y};
 			}
 		}
 	}
 
 	return nullptr;
+}
+
+void Frame::FloodFill8Stack(Vector2<uint32_t> startpoint, uint32_t fillcolor, uint32_t stopcolor)
+{
+	uint32_t* data_ptr = data;
+	
+	std::vector<uint32_t*> stack(width * height);
+
+	auto** stack_ptr = stack.data();
+	*stack_ptr++ = data_ptr + startpoint.x + startpoint.y*width;
+	while(stack.data() != stack_ptr)
+	{
+		uint32_t* top = *(--stack_ptr);
+		size_t off = size_t(top-data);
+		// printf("filling %lu %lu\n", off%width, off/width);
+		*top = stopcolor;
+		// uint32_t off = -width;
+		if(*(top - width) != stopcolor)
+			*stack_ptr++ = top-width;
+		if(top[+width] != stopcolor)
+			*stack_ptr++ = top+width;
+		if(top[-1] != stopcolor)
+			*stack_ptr++ = top-1;
+		if(top[+1] != stopcolor)
+			*stack_ptr++ = top+1;
+	}
+
 }
