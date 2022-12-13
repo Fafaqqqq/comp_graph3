@@ -5,8 +5,8 @@
 
 #define pi 3.1415
 
-Frame::Frame(uint32_t width, uint32_t height, uint32_t background)
-: data(new uint32_t[width * height]), width(width), height(height)
+Frame::Frame(uint32_t width, uint32_t height, uint32_t background, Attributes attr)
+: data(new uint32_t[width * height]), width(width), height(height), attr(attr)
 {
   for (uint32_t i = 0; i < this->height; ++i)
 	{
@@ -15,6 +15,33 @@ Frame::Frame(uint32_t width, uint32_t height, uint32_t background)
 			*(data + j + i * this->width) = background;
 		}
 	}
+
+	// if (this->attr.axes)
+	// {
+	// 	MakeAxes();
+	// }
+
+	// if (this->attr.grid)
+	// {
+	// 	MakeGrid();
+	// }
+}
+
+Frame::Frame(uint32_t width,
+						 uint32_t height,
+						 const std::vector<Circle<uint32_t>>& circles,
+						 uint32_t background,
+						 Frame::Attributes attr)
+: Frame(width, height, background, attr)
+{
+	if (circles.size())
+	{
+		for (uint32_t i = 0; i < circles.size(); i++)
+		{
+			DrawCircle(circles[i]);
+		}
+	}
+
 }
 
 Frame::~Frame()
@@ -89,16 +116,17 @@ void Frame::MakeGrid()
   }
 }
 
-void Frame::DrawCircle(uint32_t x0, uint32_t y0, uint32_t radius) {
+void Frame::DrawCircle(const Circle<uint32_t>& circle) {
 	int x = 0;
-	int y = radius;
-	int delta = 1 - 2 * radius;
+	int y = circle.radius;
+	int delta = 1 - 2 * circle.radius;
 	int error = 0;
-	while(y >= 0) {
-		SetPixel(x0 + x, y0 + y);
-		SetPixel(x0 + x, y0 - y);
-		SetPixel(x0 - x, y0 + y);
-		SetPixel(x0 - x, y0 - y);
+	while(y >= 0)
+	{
+		SetPixel(circle.centre.x + x, circle.centre.y + y);
+		SetPixel(circle.centre.x + x, circle.centre.y - y);
+		SetPixel(circle.centre.x - x, circle.centre.y + y);
+		SetPixel(circle.centre.x - x, circle.centre.y - y);
 		error = 2 * (delta + y) - 1;
 		if(delta < 0 && error <= 0) {
 			++x;
@@ -117,59 +145,61 @@ void Frame::DrawCircle(uint32_t x0, uint32_t y0, uint32_t radius) {
 	}
 }
 
-void Frame::DrawFrame()
-{
-  DrawCircle(width / 2 - 20, height / 2 + 30, 140);
-	DrawCircle(width / 2 - 20, height / 2 + 30, 141);
-	DrawCircle(width / 2 - 20, height / 2 + 30, 142);
-	DrawCircle(width / 2 - 20, height / 2 + 30, 143);
-
-  DrawCircle(width / 2 - 150, height / 2 - 100, 120);
-	DrawCircle(width / 2 - 150, height / 2 - 100, 121);
-	DrawCircle(width / 2 - 150, height / 2 - 100, 122);
-	DrawCircle(width / 2 - 150, height / 2 - 100, 123);
-
-  DrawCircleAxes(width / 2 + 20, height / 2 - 120, 170);
-	DrawCircleAxes(width / 2 + 20, height / 2 - 120, 171);
-	DrawCircleAxes(width / 2 + 20, height / 2 - 120, 172);
-	DrawCircleAxes(width / 2 + 20, height / 2 - 120, 173);
-
-	auto res = FindIntersection();
-
-	FloodFill8(res.x, res.y, 0xEBE39EFF, 0);
-}
-
-void Frame::DrawCircleAxes(uint32_t x0, uint32_t y0, uint32_t radius)
+void Frame::DrawCircleAxes(const Circle<uint32_t>& circle)
 {
 	for (double i = 0; i < 2 * pi; i += 0.005)
 	{
-		double x = radius * cos(i);
-		double y = radius * sin(i);
+		double x = circle.radius * cos(i);
+		double y = circle.radius * sin(i);
 
-		SetPixel(x0 + (uint32_t)floor(x), y0 + (uint32_t)floor(y));
+		SetPixel(circle.centre.x + (uint32_t)floor(x), circle.centre.y + (uint32_t)floor(y));
 	}
 }
 
-
-void Frame::FloodFill8(const uint32_t& x, const uint32_t& y, const uint32_t& fillcolor, const uint32_t& stopcolor)
+void Frame::DrawFrame(const std::vector<Circle<uint32_t>>& circles)
 {
-	if(x >= 0 && x < width && y >= 0 && y < height && data[x + y * width] != fillcolor && data[x + y * width] != stopcolor)
+	if (circles.size() == 0)
 	{
-		data[x + y * width] = fillcolor;
-		
-		FloodFill8(x + 1, y, fillcolor, stopcolor);
-		FloodFill8(x - 1, y, fillcolor, stopcolor);
-		FloodFill8(x, y + 1, fillcolor, stopcolor); 
-		FloodFill8(x, y - 1, fillcolor, stopcolor);
+		return;
+	}
 
-		FloodFill8(x + 1, y + 1, fillcolor, stopcolor); 
-		FloodFill8(x - 1, y - 1, fillcolor, stopcolor); 
-		FloodFill8(x - 1, y + 1, fillcolor, stopcolor); 
-		FloodFill8(x + 1, y - 1, fillcolor, stopcolor); 
+	for (uint32_t i = 0; i < circles.size() - 1; i++)
+	{
+		DrawCircle(circles[i]);
+	}
+
+	DrawCircleAxes(circles[circles.size() - 1]);
+
+	auto res = FindIntersection();
+
+	if (res)
+	{
+		FloodFill8(*res, 0xEBE39EFF, 0);
 	}
 }
 
-Vector2<int32_t> Frame::FindIntersection()
+void Frame::FloodFill8(Vector2<uint32_t> point, uint32_t fillcolor, uint32_t stopcolor)
+{
+	if(point.x >= 0 && point.x < width &&
+	   point.y >= 0 && point.y < height && 
+		 data[point.x + point.y * width] != fillcolor && 
+		 data[point.x + point.y * width] != stopcolor)
+	{
+		data[point.x + point.y * width] = fillcolor;
+		
+		FloodFill8({point.x + 1, point.y}, fillcolor, stopcolor);
+		FloodFill8({point.x - 1, point.y}, fillcolor, stopcolor);
+		FloodFill8({point.x, point.y + 1}, fillcolor, stopcolor); 
+		FloodFill8({point.x, point.y - 1}, fillcolor, stopcolor);
+
+		// FloodFill8({point.x + 1, point.y + 1}, fillcolor, stopcolor); 
+		// FloodFill8({point.x - 1, point.y - 1}, fillcolor, stopcolor); 
+		// FloodFill8({point.x - 1, point.y + 1}, fillcolor, stopcolor); 
+		// FloodFill8({point.x + 1, point.y - 1}, fillcolor, stopcolor); 
+	}
+}
+
+Vector2<uint32_t>* Frame::FindIntersection()
 {
 	uint32_t x0 = width / 2 - 20;
 	uint32_t y0 = height / 2 + 30;
@@ -195,10 +225,10 @@ Vector2<int32_t> Frame::FindIntersection()
 		{
 			if (!count--)
 			{
-				return {x, y};
+				return new Vector2<uint32_t>{x, y};
 			}
 		}
 	}
 
-	return {-1, -1};
+	return nullptr;
 }

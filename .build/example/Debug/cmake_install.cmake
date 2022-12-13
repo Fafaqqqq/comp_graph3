@@ -1,4 +1,4 @@
-# Install script for directory: /home/fafaq/repos/projects/cpp/comp_graphics/lab3
+# Install script for directory: /home/vika/git/comp_graph3
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -44,7 +44,7 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("/home/fafaq/repos/projects/cpp/comp_graphics/lab3/.build/example/Debug/example/cmake_install.cmake")
+  include("/home/vika/git/comp_graph3/.build/example/Debug/example/cmake_install.cmake")
 endif()
 
 if(CMAKE_INSTALL_COMPONENT)
@@ -55,5 +55,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/home/fafaq/repos/projects/cpp/comp_graphics/lab3/.build/example/Debug/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/vika/git/comp_graph3/.build/example/Debug/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

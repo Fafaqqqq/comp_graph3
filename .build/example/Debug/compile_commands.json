@@ -1,12 +1,12 @@
 [
 {
-  "directory": "/home/fafaq/repos/projects/cpp/comp_graphics/lab3/.build/example/Debug",
-  "command": "/usr/bin/c++ -g -Wl,--stack,67108864 -std=gnu++14 -o example/CMakeFiles/lab1.dir/src/frame.cpp.o -c /home/fafaq/repos/projects/cpp/comp_graphics/lab3/example/src/frame.cpp",
-  "file": "/home/fafaq/repos/projects/cpp/comp_graphics/lab3/example/src/frame.cpp"
+  "directory": "/home/vika/git/comp_graph3/.build/example/Debug",
+  "command": "/usr/bin/c++ -g -Wl,--stack,67108864 -std=gnu++14 -o example/CMakeFiles/lab1.dir/src/frame.cpp.o -c /home/vika/git/comp_graph3/example/src/frame.cpp",
+  "file": "/home/vika/git/comp_graph3/example/src/frame.cpp"
 },
 {
-  "directory": "/home/fafaq/repos/projects/cpp/comp_graphics/lab3/.build/example/Debug",
-  "command": "/usr/bin/c++ -g -Wl,--stack,67108864 -std=gnu++14 -o example/CMakeFiles/lab1.dir/src/main.cpp.o -c /home/fafaq/repos/projects/cpp/comp_graphics/lab3/example/src/main.cpp",
-  "file": "/home/fafaq/repos/projects/cpp/comp_graphics/lab3/example/src/main.cpp"
+  "directory": "/home/vika/git/comp_graph3/.build/example/Debug",
+  "command": "/usr/bin/c++ -g -Wl,--stack,67108864 -std=gnu++14 -o example/CMakeFiles/lab1.dir/src/main.cpp.o -c /home/vika/git/comp_graph3/example/src/main.cpp",
+  "file": "/home/vika/git/comp_graph3/example/src/main.cpp"
 }
 ]

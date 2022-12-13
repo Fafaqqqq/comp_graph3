@@ -18,11 +18,15 @@ int main(int argc, char **argv)
 	sf::ContextSettings settings;
 	settings.antialiasingLevel = 8;
 
-	Frame frame(kWidth, kHeight);
+	Frame frame(kWidth, kHeight, 0xFFFFFFFF, {true, true, 25});
 
-	frame.MakeAxes();
-	frame.DrawFrame();
-	frame.MakeGrid();
+	// frame.MakeAxes();
+	frame.DrawFrame({
+		{kWidth / 2 - 20, kHeight / 2 + 30, 140},
+		{kWidth / 2 - 150, kHeight / 2 - 100, 120},
+		{kWidth / 2 + 20, kHeight / 2 - 120, 170}
+	});
+	// frame.MakeGrid();
 
 	sf::Image image;
 
@@ -47,6 +51,7 @@ int main(int argc, char **argv)
 			}
 		}
 
+		window.clear();
 		window.draw(sprite);
 
 		window.display();

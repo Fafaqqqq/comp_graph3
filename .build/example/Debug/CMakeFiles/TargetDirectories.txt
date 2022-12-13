@@ -1,5 +1,5 @@
-/home/fafaq/repos/projects/cpp/comp_graphics/lab3/.build/example/Debug/CMakeFiles/edit_cache.dir
-/home/fafaq/repos/projects/cpp/comp_graphics/lab3/.build/example/Debug/CMakeFiles/rebuild_cache.dir
-/home/fafaq/repos/projects/cpp/comp_graphics/lab3/.build/example/Debug/example/CMakeFiles/lab1.dir
-/home/fafaq/repos/projects/cpp/comp_graphics/lab3/.build/example/Debug/example/CMakeFiles/edit_cache.dir
-/home/fafaq/repos/projects/cpp/comp_graphics/lab3/.build/example/Debug/example/CMakeFiles/rebuild_cache.dir
+/home/vika/git/comp_graph3/.build/example/Debug/CMakeFiles/edit_cache.dir
+/home/vika/git/comp_graph3/.build/example/Debug/CMakeFiles/rebuild_cache.dir
+/home/vika/git/comp_graph3/.build/example/Debug/example/CMakeFiles/lab1.dir
+/home/vika/git/comp_graph3/.build/example/Debug/example/CMakeFiles/edit_cache.dir
+/home/vika/git/comp_graph3/.build/example/Debug/example/CMakeFiles/rebuild_cache.dir

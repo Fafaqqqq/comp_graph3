@@ -1,4 +1,4 @@
-# Install script for directory: /home/fafaq/repos/projects/cpp/comp_graphics/lab3/example
+# Install script for directory: /home/vika/git/comp_graph3/example
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
