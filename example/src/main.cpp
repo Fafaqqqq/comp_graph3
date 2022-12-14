@@ -1,7 +1,6 @@
 #include <iostream>
 #include <fstream>
 #include <cstdint>
-#include <sys/resource.h>
 
 #include <SFML/Graphics.hpp>
 
@@ -19,9 +18,11 @@ int main(int argc, char **argv)
 	settings.antialiasingLevel = 8;
 
 	Frame::Attributes attr;
-	attr.drawcicles = true;
-	attr.axes = true;
-	attr.grid = true;
+	// attr.drawcicles = true;
+	// attr.axes = true;
+	// attr.grid = true;
+	// attr.drawtype = Frame::DRAW_B;
+	// attr.filltype = Frame::FILL_B;
 
 	Frame frame(kWidth, kHeight, attr);
 
@@ -29,20 +30,7 @@ int main(int argc, char **argv)
 		{kWidth / 2 - 20, kHeight / 2 + 30, 140},
 		{kWidth / 2 - 150, kHeight / 2 - 100, 120},
 		{kWidth / 2 + 20, kHeight / 2 - 120, 170},
-		{kWidth / 2 - 175, kHeight / 2 + 50, 50}
 	}, 0xFF00F421);
-
-	// frame.DrawIntersectionBresenham({
-	// 	{kWidth / 2 - 20, kHeight / 2 + 30, 140},
-	// 	{kWidth / 2 - 150, kHeight / 2 - 100, 120},
-	// 	{kWidth / 2 + 20, kHeight / 2 - 120, 170}
-	// });
-
-	// frame.DrawIntersectionSinCos({
-	// 	{kWidth / 2 - 100, kHeight / 2, 150},
-	// 	{kWidth / 2 - 100, kHeight / 2, 150},
-	// 	{kWidth / 2, kHeight / 2, 100}
-	// });
 
 	sf::Image image;
 

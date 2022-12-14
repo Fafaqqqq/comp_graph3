@@ -1,12 +1,11 @@
 #include "frame.h"
 #include "circle.h"
 
-#include <algorithm>
 #include <cmath>
 #include <cstdint>
-#include <cstdio>
 #include <vector>
 #include <iostream>
+#include <chrono>
 
 #define pi 3.1415
 
@@ -101,10 +100,10 @@ void Frame::SetGrid()
 }
 
 void Frame::DrawCircleBresenham(const Circle<uint32_t>& circle) {
-	uint32_t x = 0;
-	uint32_t y = circle.radius;
-	uint32_t delta = 1 - 2 * circle.radius;
-	uint32_t error = 0;
+	int32_t x = 0;
+	int32_t y = circle.radius;
+	int32_t delta = 1 - 2 * circle.radius;
+	int32_t error = 0;
 
 	while(y >= 0)
 	{
@@ -150,15 +149,25 @@ void Frame::Draw(const std::vector<Circle<uint32_t>>& circles, uint32_t fillcolo
 {
 	if (attr.drawcicles)
 	{
-		for (auto& circle : circles)
+		for (uint32_t i = 0; i < circles.size(); i++)
 		{
+			auto begin = std::chrono::steady_clock::now();
 			if (attr.drawtype == DRAW_A)
 			{
-				DrawCirclePolar(circle);
+				DrawCirclePolar(circles[i]);
+				auto end = std::chrono::steady_clock::now();
+				auto elapsed_ms = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
+
+				printf("[Draw type - A, circle - %d ]: time -> %.4fms\n", i, elapsed_ms.count() / 1000000.);
 			}
 			else
 			{
-				DrawCircleBresenham(circle);
+				auto begin = std::chrono::steady_clock::now();
+				DrawCircleBresenham(circles[i]);
+				auto end = std::chrono::steady_clock::now();
+				auto elapsed_ms = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
+
+				printf("[Draw type - B, circle - %d ]: time -> %.4fms\n", i, elapsed_ms.count() / 1000000.);
 			}
 		}
 	}
@@ -166,11 +175,21 @@ void Frame::Draw(const std::vector<Circle<uint32_t>>& circles, uint32_t fillcolo
 	{
 		if (attr.drawtype == DRAW_A)
 		{
+			auto begin = std::chrono::steady_clock::now();
 			DrawIntersectionPolar(circles);
+			auto end = std::chrono::steady_clock::now();
+			auto elapsed_ms = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
+
+			printf("[Draw type A]: time -> %.4fms\n", elapsed_ms.count() / 1000000.);
 		}
 		else
 		{
+			auto begin = std::chrono::steady_clock::now();
 			DrawIntersectionBresenham(circles);
+			auto end = std::chrono::steady_clock::now();
+			auto elapsed_ms = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
+
+			printf("[Draw type B]: time -> %.4fms\n", elapsed_ms.count() / 1000000.);
 		}
 	}
 
@@ -180,11 +199,21 @@ void Frame::Draw(const std::vector<Circle<uint32_t>>& circles, uint32_t fillcolo
 	{
 		if (attr.filltype == FILL_A)
 		{
+			auto begin = std::chrono::steady_clock::now();
 			FloodFill8Recursive(point, fillcolor, 0);
+			auto end = std::chrono::steady_clock::now();
+			auto elapsed_ms = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
+
+			printf("[Fill type A]: time -> %.4fms\n", elapsed_ms.count() / 1000000.);
 		}
 		else
 		{
+			auto begin = std::chrono::steady_clock::now();
 			FloodFill8Stack(point, fillcolor, 0);
+			auto end = std::chrono::steady_clock::now();
+			auto elapsed_ms = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
+
+			printf("[Fill type B]: time -> %.4fms\n", elapsed_ms.count() / 1000000.);
 		}
 	}
 	
@@ -203,11 +232,11 @@ void Frame::DrawIntersectionBresenham(const std::vector<Circle<uint32_t>>& circl
 {
 	for (uint32_t i = 0; i < circles.size(); i++)
 	{
-		uint32_t intersect_count = 0;
-		uint32_t x = 0;
-		uint32_t y = circles[i].radius;
-		uint32_t delta = 1 - 2 * circles[i].radius;
-		uint32_t error = 0;
+		int32_t intersect_count = 0;
+		int32_t x = 0;
+		int32_t y = circles[i].radius;
+		int32_t delta = 1 - 2 * circles[i].radius;
+		int32_t error = 0;
 
 		while(y >= 0)
 		{
@@ -255,7 +284,7 @@ void Frame::IsInsideIntersection(const Vector2<uint32_t>& pixel, const std::vect
 		}
 	}
 	
-	if (intersect_count)
+	if (intersect_count == 3)
 	{
 		SetPixel(pixel.x, pixel.y);
 	}
@@ -272,8 +301,8 @@ void Frame::DrawIntersectionPolar(const std::vector<Circle<uint32_t>>& circles)
 			double x = circles[i].radius * cos(angle) + circles[i].centre.x;
 			double y = circles[i].radius * sin(angle) + circles[i].centre.y;
 
-			double x_ = (circles[i].radius - 2) * cos(angle) + circles[i].centre.x;
-			double y_ = (circles[i].radius - 2) * sin(angle) + circles[i].centre.y;
+			double x_ = (circles[i].radius - 1) * cos(angle) + circles[i].centre.x;
+			double y_ = (circles[i].radius - 1) * sin(angle) + circles[i].centre.y;
 			
 			for (uint32_t j = 0; j < circles.size(); j++)
 			{
@@ -325,29 +354,28 @@ void Frame::FloodFill8Stack(Vector2<uint32_t> startpoint, uint32_t fillcolor, ui
 		uint32_t* top = *(--stack_ptr);
 		size_t off = size_t(top-data);
 
-		*top = stopcolor;
+		*top = fillcolor;
 
-		if(*(top - width) != stopcolor)
+		if(*(top - width) != stopcolor && *(top - width) == attr.background)
 		{
 			*stack_ptr++ = top-width;
 		}
 
-		if(top[+width] != stopcolor)
+		if(top[+width] != stopcolor && top[+width] == attr.background)
 		{
 			*stack_ptr++ = top+width;
 		}
 
-		if(top[-1] != stopcolor)
+		if(top[-1] != stopcolor && top[-1] == attr.background)
 		{
 			*stack_ptr++ = top-1;
 		}
 
-		if(top[+1] != stopcolor)
+		if(top[+1] != stopcolor && top[+1] == attr.background)
 		{
 			*stack_ptr++ = top+1;
 		}
 	}
-
 }
 
 std::vector<Vector2<uint32_t>> Frame::FindIntersection(const std::vector<Circle<uint32_t>>& circles)
@@ -359,8 +387,8 @@ std::vector<Vector2<uint32_t>> Frame::FindIntersection(const std::vector<Circle<
 	{
 		uint32_t intersect_count = 0;
 		
-		double x = (circles[0].radius - 10) * cos(angle) + circles[0].centre.x;
-		double y = (circles[0].radius - 10) * sin(angle) + circles[0].centre.y;
+		double x = (circles[0].radius - 1) * cos(angle) + circles[0].centre.x;
+		double y = (circles[0].radius - 1) * sin(angle) + circles[0].centre.y;
 		
 		for (uint32_t j = 1; j < circles.size(); j++)
 		{
