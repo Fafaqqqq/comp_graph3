@@ -35,6 +35,8 @@ class Frame
     void MakeGrid();
     void DrawFrame(const std::vector<Circle<uint32_t>>& circles);
     void FillShape(uint32_t color = 0xFFFFFFFF);
+    void DrawIntersectionBresenham(const std::vector<Circle<uint32_t>>& circles);
+    void DrawIntersectionSinCos(const std::vector<Circle<uint32_t>>& circles);
 
     inline uint32_t* GetData()
     {
@@ -58,8 +60,9 @@ class Frame
     void DrawCircleAxes(const Circle<uint32_t>& circle);
     void FloodFill8(Vector2<uint32_t> startpoint, uint32_t fillcolor, uint32_t stopcolor);
     void FloodFill8Stack(Vector2<uint32_t> startpoint, uint32_t fillcolor, uint32_t stopcolor);
+    void CheckAndSetPixel(const Vector2<uint32_t>&, const std::vector<Circle<uint32_t>>& circles );
     
-    Vector2<uint32_t>* FindIntersection();
+    Vector2<uint32_t>* FindIntersection(const std::vector<Circle<uint32_t>>& circles);
 
     uint32_t* data;
     uint32_t  width;

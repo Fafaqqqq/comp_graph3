@@ -1,9 +1,12 @@
 #include "frame.h"
+#include "circle.h"
 
+#include <algorithm>
 #include <cmath>
 #include <cstdint>
 #include <cstdio>
 #include <vector>
+#include <iostream>
 
 #define pi 3.1415
 
@@ -160,23 +163,110 @@ void Frame::DrawCircleAxes(const Circle<uint32_t>& circle)
 
 void Frame::DrawFrame(const std::vector<Circle<uint32_t>>& circles)
 {
-	if (circles.size() == 0)
-	{
-		return;
-	}
+	DrawIntersectionBresenham(circles);
+	// DrawIntersectionSinCos(circles);
 
-	for (uint32_t i = 0; i < circles.size() - 1; i++)
-	{
-		DrawCircle(circles[i]);
-	}
+	// for (auto & circle : circles)
+	// {
+	// 	DrawCircle(circle);
+	// }
 
-	DrawCircleAxes(circles[circles.size() - 1]);
 
-	auto res = FindIntersection();
+	auto res = FindIntersection(circles);
 
 	if (res)
 	{
-		FloodFill8Stack(*res, 0xEBE39EFF, 0);
+		FloodFill8(*res, 0xEBE39EFF, 0);
+	}
+}
+
+void Frame::DrawIntersectionBresenham(const std::vector<Circle<uint32_t>>& circles)
+{
+	for (uint32_t i = 0; i < circles.size(); i++)
+	{
+		uint32_t intersect_count = 0;
+		int x = 0;
+		int y = circles[i].radius;
+		int delta = 1 - 2 * circles[i].radius;
+		int error = 0;
+
+		while(y >= 0)
+		{
+			CheckAndSetPixel({circles[i].centre.x + x, circles[i].centre.y - y}, circles);
+			CheckAndSetPixel({circles[i].centre.x + x, circles[i].centre.y + y}, circles);
+			CheckAndSetPixel({circles[i].centre.x - x, circles[i].centre.y - y}, circles);
+			CheckAndSetPixel({circles[i].centre.x - x, circles[i].centre.y + y}, circles);
+
+			error = 2 * (delta + y) - 1;
+			if(delta < 0 && error <= 0) {
+				++x;
+				delta += 2 * x + 1;
+				continue;
+			}
+			error = 2 * (delta - x) - 1;
+			if(delta > 0 && error > 0) {
+				--y;
+				delta += 1 - 2 * y;
+				continue;
+			}
+			++x;
+			delta += 2 * (x - y);
+			--y;
+		}
+		
+	}
+}
+
+void Frame::CheckAndSetPixel(const Vector2<uint32_t>& point, const std::vector<Circle<uint32_t>>& circles)
+{
+	uint32_t intersect_count = 0;
+	double x_ = point.x - 1;
+	double y_ = point.y - 1;
+
+	for (uint32_t j = 0; j < circles.size(); j++)
+	{
+		double x_ = circles[j].centre.x > point.x ? point.x + 2 : point.x - 2;
+		double y_ = circles[j].centre.y > point.y ? point.y + 2 : point.y - 2;
+
+		if (pow((x_ - circles[j].centre.x), 2) + pow((y_ - circles[j].centre.y), 2) <= pow(circles[j].radius, 2))
+		{
+			intersect_count++;
+		}
+	}
+	
+	if (intersect_count == 3)
+	{
+		SetPixel(point.x, point.y);
+	}
+}
+
+void Frame::DrawIntersectionSinCos(const std::vector<Circle<uint32_t>>& circles)
+{
+	for (uint32_t i = 0; i < circles.size(); i++)
+	{
+		for (double angle = 0; angle < 2 * pi; angle += 0.005)
+		{
+			uint32_t intersect_count = 0;
+
+			double x = circles[i].radius * cos(angle) + circles[i].centre.x;
+			double y = circles[i].radius * sin(angle) + circles[i].centre.y;
+
+			double x_ = (circles[i].radius - 2) * cos(angle) + circles[i].centre.x;
+			double y_ = (circles[i].radius - 2) * sin(angle) + circles[i].centre.y;
+			
+			for (uint32_t j = 0; j < circles.size(); j++)
+			{
+				if (pow((x_ - circles[j].centre.x), 2) + pow((y_ - circles[j].centre.y), 2) <= pow(circles[j].radius, 2))
+				{
+					intersect_count++;
+				}
+			}
+
+			if (intersect_count >= 3)
+			{
+				SetPixel((uint32_t)floor(x),(uint32_t)floor(y));
+			}
+		}
 	}
 }
 
@@ -201,34 +291,28 @@ void Frame::FloodFill8(Vector2<uint32_t> point, uint32_t fillcolor, uint32_t sto
 	}
 }
 
-Vector2<uint32_t>* Frame::FindIntersection()
+Vector2<uint32_t>* Frame::FindIntersection(const std::vector<Circle<uint32_t>>& circles)
 {
-	uint32_t x0 = width / 2 - 20;
-	uint32_t y0 = height / 2 + 30;
-	uint32_t r0 = 140;
-
-	uint32_t x1 = width / 2 - 150;
-	uint32_t y1 = height / 2 - 100;
-	uint32_t r1 = 120;
-
-	uint32_t x2 = width / 2 + 20;
-	uint32_t y2 = height / 2 - 120;
-	uint32_t r2 = 170;
-
 	int count = 50;
 
-	for (double i = 0.; i < 2 * pi; i += 0.005)
+	for (double angle = 0; angle < 2 * pi; angle += 0.005)
 	{
-		double x = (r0 - 10) * cos(i) + x0;
-		double y = (r0 - 10) * sin(i) + y0;
-
-		if (pow((x - x1), 2) + pow((y - y1), 2) < pow(r1, 2) &&
-				pow((x - x2), 2) + pow((y - y2), 2) < pow(r2, 2))
+		uint32_t intersect_count = 0;
+		
+		double x = (circles[0].radius - 10) * cos(angle) + circles[0].centre.x;
+		double y = (circles[0].radius - 10) * sin(angle) + circles[0].centre.y;
+		
+		for (uint32_t j = 1; j < circles.size(); j++)
 		{
-			if (!count--)
+			if (pow((x - circles[j].centre.x), 2) + pow((y - circles[j].centre.y), 2) <= pow(circles[j].radius, 2))
 			{
-				return new Vector2<uint32_t>{(uint32_t)x, (uint32_t)y};
+				intersect_count++;
 			}
+		}
+
+		if (intersect_count == 2 && !count--)
+		{
+			return new Vector2<uint32_t>{(uint32_t)x, (uint32_t)y};
 		}
 	}
 

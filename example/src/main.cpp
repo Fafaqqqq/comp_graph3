@@ -20,13 +20,32 @@ int main(int argc, char **argv)
 
 	Frame frame(kWidth, kHeight, 0xFFFFFFFF, {true, true, 25});
 
-	// frame.MakeAxes();
+	
+	// frame.DrawFrame({
+	// 	{kWidth / 2 - 20, kHeight / 2 + 30, 140},
+	// 	{kWidth / 2 - 150, kHeight / 2 - 100, 120},
+	// 	{kWidth / 2 + 20, kHeight / 2 - 120, 170}
+	// });
+
 	frame.DrawFrame({
-		{kWidth / 2 - 20, kHeight / 2 + 30, 140},
-		{kWidth / 2 - 150, kHeight / 2 - 100, 120},
-		{kWidth / 2 + 20, kHeight / 2 - 120, 170}
+		{kWidth / 2 - 100, kHeight / 2, 150},
+		{kWidth / 2 + 100, kHeight / 2, 150},
+		{kWidth / 2, kHeight / 2, 90}
 	});
+
+	// frame.DrawIntersectionBresenham({
+	// 	{kWidth / 2 - 20, kHeight / 2 + 30, 140},
+	// 	{kWidth / 2 - 150, kHeight / 2 - 100, 120},
+	// 	{kWidth / 2 + 20, kHeight / 2 - 120, 170}
+	// });
+
+	// frame.DrawIntersectionSinCos({
+	// 	{kWidth / 2 - 100, kHeight / 2, 150},
+	// 	{kWidth / 2 - 100, kHeight / 2, 150},
+	// 	{kWidth / 2, kHeight / 2, 100}
+	// });
 	// frame.MakeGrid();
+	frame.MakeAxes();
 
 	sf::Image image;
 
