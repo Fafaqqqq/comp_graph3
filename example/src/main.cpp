@@ -18,20 +18,19 @@ int main(int argc, char **argv)
 	sf::ContextSettings settings;
 	settings.antialiasingLevel = 8;
 
-	Frame frame(kWidth, kHeight, 0xFFFFFFFF, {true, true, 25});
+	Frame::Attributes attr;
+	attr.drawcicles = true;
+	attr.axes = true;
+	attr.grid = true;
 
-	
-	// frame.DrawFrame({
-	// 	{kWidth / 2 - 20, kHeight / 2 + 30, 140},
-	// 	{kWidth / 2 - 150, kHeight / 2 - 100, 120},
-	// 	{kWidth / 2 + 20, kHeight / 2 - 120, 170}
-	// });
+	Frame frame(kWidth, kHeight, attr);
 
-	frame.DrawFrame({
-		{kWidth / 2 - 100, kHeight / 2, 150},
-		{kWidth / 2 + 100, kHeight / 2, 150},
-		{kWidth / 2, kHeight / 2, 90}
-	});
+	frame.Draw({
+		{kWidth / 2 - 20, kHeight / 2 + 30, 140},
+		{kWidth / 2 - 150, kHeight / 2 - 100, 120},
+		{kWidth / 2 + 20, kHeight / 2 - 120, 170},
+		{kWidth / 2 - 175, kHeight / 2 + 50, 50}
+	}, 0xFF00F421);
 
 	// frame.DrawIntersectionBresenham({
 	// 	{kWidth / 2 - 20, kHeight / 2 + 30, 140},
@@ -44,8 +43,6 @@ int main(int argc, char **argv)
 	// 	{kWidth / 2 - 100, kHeight / 2, 150},
 	// 	{kWidth / 2, kHeight / 2, 100}
 	// });
-	// frame.MakeGrid();
-	frame.MakeAxes();
 
 	sf::Image image;
 

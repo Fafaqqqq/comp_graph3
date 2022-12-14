@@ -10,33 +10,39 @@
 class Frame
 {
   public:
+    enum DrawType
+    {
+      DRAW_A,
+      DRAW_B
+    };
+
+    enum FillType
+    {
+      FILL_A,
+      FILL_B
+    };
+
     struct Attributes
     {
-      bool axes;
-      bool grid;
-      uint32_t gridstep;
-      
+      bool axes{false};
+      bool grid{false};
+      bool drawcicles{false};
+      uint32_t gridstep{25};
+      uint32_t background{0xFFFFFFFF};
+      FillType filltype{FILL_A};
+      DrawType drawtype{DRAW_A};
     };
 
     Frame(uint32_t width,
-          uint32_t height,
-          uint32_t background = 0xFFFFFFFF,
-          Attributes attr = {false, false, 0});
+          uint32_t height);
 
     Frame(uint32_t width,
           uint32_t height,
-          const std::vector<Circle<uint32_t>>& circles,
-          uint32_t background = 0xFFFFFFFF,
-          Attributes attr = {false, false, 0});
+          Attributes attr);
 
     ~Frame();
 
-    void MakeAxes();
-    void MakeGrid();
-    void DrawFrame(const std::vector<Circle<uint32_t>>& circles);
-    void FillShape(uint32_t color = 0xFFFFFFFF);
-    void DrawIntersectionBresenham(const std::vector<Circle<uint32_t>>& circles);
-    void DrawIntersectionSinCos(const std::vector<Circle<uint32_t>>& circles);
+    void Draw(const std::vector<Circle<uint32_t>>& circles, uint32_t fillcolor = 0xFFFFFFFF);
 
     inline uint32_t* GetData()
     {
@@ -54,15 +60,23 @@ class Frame
     }
 
   private:
+    void SetAxes();
+    void SetGrid();
     void SetPixel(uint32_t x, uint32_t y);
-    void DrawLine(uint32_t x1, uint32_t y1, uint32_t x2, uint32_t y2);
-    void DrawCircle(const Circle<uint32_t>& circle);
-    void DrawCircleAxes(const Circle<uint32_t>& circle);
-    void FloodFill8(Vector2<uint32_t> startpoint, uint32_t fillcolor, uint32_t stopcolor);
+
+    void DrawLine(Vector2<int32_t> begin, Vector2<int32_t> end);
+    void DrawCircleBresenham(const Circle<uint32_t>& circle);
+    void DrawCirclePolar(const Circle<uint32_t>& circle);
+
+    void FloodFill8Recursive(Vector2<uint32_t> startpoint, uint32_t fillcolor, uint32_t stopcolor);
     void FloodFill8Stack(Vector2<uint32_t> startpoint, uint32_t fillcolor, uint32_t stopcolor);
-    void CheckAndSetPixel(const Vector2<uint32_t>&, const std::vector<Circle<uint32_t>>& circles );
+
+    void DrawIntersectionBresenham(const std::vector<Circle<uint32_t>>& circles);
+    void DrawIntersectionPolar(const std::vector<Circle<uint32_t>>& circles);
+
+    void IsInsideIntersection(const Vector2<uint32_t>& pixel, const std::vector<Circle<uint32_t>>& circles);
     
-    Vector2<uint32_t>* FindIntersection(const std::vector<Circle<uint32_t>>& circles);
+    std::vector<Vector2<uint32_t>> FindIntersection(const std::vector<Circle<uint32_t>>& circles);
 
     uint32_t* data;
     uint32_t  width;
